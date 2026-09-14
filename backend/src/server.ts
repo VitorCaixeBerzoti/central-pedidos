@@ -1,5 +1,6 @@
 import express from "express";
 import { z } from "zod";
+import { prisma } from "./lib/prisma.js";
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.get("/health", (_req, res) => {
     });
 });
 
-app.post("/pedidos", (req, res) => {
+app.post("/pedidos", async(req, res) => {
     const validacao = pedidoSchema.safeParse(req.body);
 
     if(!validacao.success) {
@@ -47,12 +48,37 @@ app.post("/pedidos", (req, res) => {
 
     const valorTotal = subtotal + pedido.frete - pedido.desconto;
 
-    res.status(200).json({
-        mensagem: "pedido validado com sucesso",
-        pedido: validacao.data,
-        subtotal: Number(subtotal.toFixed(2)),
-        valor_total: Number(valorTotal.toFixed(2))
-    });;
+    try {
+        const pedidoSalvo = await prisma.pedido.create({
+            data: {
+                pedido_id: pedido.pedido_id,
+                frete: pedido.desconto,
+                desconto: pedido.desconto,
+                valor_total: Number(valorTotal.toFixed(2)),
+                itens: {
+                    create: pedido.itens.map((item) => ({
+                        sku: item.sku,
+                        quantidade: item.quantidade,
+                        valor_unitario: item.valor_unitario
+                    }))
+                }
+            },
+            include: {
+                itens: true
+            }
+        })
+        
+        res.status(201).json({
+            mensagem: "pedido cadastrado com sucesso",
+            pedido: pedidoSalvo
+        })
+        } catch (erro) {
+            console.error(erro);
+
+            res.status(500).json({
+                mensagem: "não foi possível salvar o pedido"
+            })
+        }
 });
 
 app.listen(3000, () => {
