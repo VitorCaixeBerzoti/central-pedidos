@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { prisma } from "../lib/prisma.js"
 import { Prisma } from "../generated/prisma/client.js"
-import { pedidoSchema, atualizarStatusSchema, transicoesPermitidas } from "../schemas/pedido.schema.js"
+import { pedidoSchema, atualizarStatusSchema, transicoesPermitidas, listarPedidosSchema } from "../schemas/pedido.schema.js"
 
 export const pedidoRouter = Router()
 
@@ -63,18 +63,56 @@ pedidoRouter.post("/", async(req, res) => {
         }
 });
 
-pedidoRouter.get("/", async (_req, res) => {
+pedidoRouter.get("/", async (req, res) => {
+    const validacao = listarPedidosSchema.safeParse(req.query)
+
+    if (!validacao.success) {
+        res.status(400).json({
+            mensagem: "Parametros de consulta invalidos.",
+            erros: validacao.error.issues
+        })
+        return
+
+        
+    }
+    
+    const { pagina, limite, status } = validacao.data
+    const filtro = status ? { status } : {}
+    
     try {
         const pedidos = await prisma.pedido.findMany({
-            include: { itens: true },
-            orderBy: { id: "desc" }
-        });
-        res.status(200).json({ pedidos });
+            where: filtro,
+            include: {
+                itens: true
+            },
+            orderBy: {
+                id: "desc"
+            },
+            skip: (pagina - 1) * limite,
+            take: limite
+        })
+
+        const total = await prisma.pedido.count({
+            where: filtro
+        })
+
+        res.status(200).json({
+            pedidos,
+            paginacao: {
+                pagina,
+                limite,
+                total,
+                total_paginas: Math.ceil(total / limite)
+            }
+        })
     } catch (erro) {
-        console.error(erro);
-        res.status(500).json({ mensagem: "Nao foi possivel consultar os pedidos." });
+        console.error(erro)
+
+        res.status(500).json({
+            mensagem: "Não foi possivel consultar os pedidos"
+        })
     }
-});
+})
 
 pedidoRouter.get("/:pedido_id", async (req, res) => {
     const { pedido_id } = req.params

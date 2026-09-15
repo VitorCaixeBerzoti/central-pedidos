@@ -32,3 +32,8 @@ export const transicoesPermitidas: Record<StatusPedido, StatusPedido[]> = {
     CANCELADO: []
 }
 
+export const listarPedidosSchema = z.object({
+    pagina: z.coerce.number().int().min(1).max(1000000).default(1),
+    limite: z.coerce.number().int().min(1).max(50).default(10),
+    status: atualizarStatusSchema.shape.status.optional()
+})
