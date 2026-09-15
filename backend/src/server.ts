@@ -21,6 +21,25 @@ const pedidoSchema = z.object({
     ).min(1)
 });
 
+const atualizarStatusSchema = z.object({
+    status: z.enum([
+        "RECEBIDO",
+        "EM_PROCESSAMENTO",
+        "CONCLUIDO",
+        "CANCELADO"
+    ])
+})
+
+type StatusPedido = z.infer<typeof atualizarStatusSchema>["status"]
+
+const transicoesPermitidas: Record<StatusPedido, StatusPedido[]> = {
+    RECEBIDO: ["EM_PROCESSAMENTO", "CANCELADO"],
+    EM_PROCESSAMENTO: ["CONCLUIDO", "CANCELADO"],
+    CONCLUIDO: [],
+    CANCELADO: []
+}
+
+
 app.get("/health", (_req, res) => {
     res.status(200).json({
         status: "ok",
@@ -127,6 +146,73 @@ app.get("/pedidos/:pedido_id", async (req, res) => {
 
         res.status(500).json({
             mensagem: "Não foi possivel consultar o pedido."
+        })
+    }
+})
+
+app.patch("/pedidos/:pedido_id/status", async (req, res) => {
+    const { pedido_id } = req.params;
+    const validacao = atualizarStatusSchema.safeParse(req.body)
+
+    if(!validacao.success) {
+        res.status(400).json({
+            mensagem: "Status inválido.",
+            erros: validacao.error.issues
+        })
+        return
+    }
+
+    const novoStatus = validacao.data.status
+
+    try {
+        const pedidoAtual = await prisma.pedido.findUnique({
+            where: {pedido_id},
+        })
+
+        if (!pedidoAtual) {
+            res.status(404).json({
+                mensagem: "Pedido não encontrado."
+            })
+            return
+        }
+
+        if (pedidoAtual.status === novoStatus) {
+            res.status(200).json({
+                mensagem: "O pedido ja esta nesse status.",
+                pedido: pedidoAtual
+            })
+            return
+        }
+
+        const pedido = await prisma.pedido.update({
+            where: {
+                pedido_id,
+                status: pedidoAtual.status
+            },
+            data: {
+                status: novoStatus
+            }
+        })
+
+        res.status(200).json({
+            mensagem: "Status atualizado com sucesso.",
+            pedido
+        })
+    } catch (erro) {
+        if (
+            erro instanceof Prisma.PrismaClientKnownRequestError &&
+            erro.code === "P2025"
+        ) {
+            res.status(409).json({
+                mensagem: "o pedido mudou ou foi removido durante a operação. Consulte novamente."
+            })
+            return
+        }
+
+        console.error(erro)
+
+        res.status(500).json({
+            mensagem: "Não foi possivel atualizar o status."
         })
     }
 })

@@ -20,6 +20,8 @@ model Pedido {
   valor_total Decimal       @db.Decimal(12, 2)
   criado_em   DateTime      @default(now())
   itens       ItemPedido[]  
+  status      StatusPedido  @default(RECEBIDO)
+  atualizado_em   DateTime  @default(now()) @updatedAt
 }
 
 model ItemPedido {
@@ -32,4 +34,11 @@ model ItemPedido {
   pedido    Pedido  @relation(fields: [pedidoId], references: [id])
 
   @@index([pedidoId])
+}
+
+enum StatusPedido {
+  RECEBIDO
+  EM_PROCESSAMENTO
+  CONCLUIDO
+  CANCELADO
 }
