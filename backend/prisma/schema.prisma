@@ -42,3 +42,23 @@ enum StatusPedido {
   CONCLUIDO
   CANCELADO
 }
+
+model Empresa {
+  id            Int         @id @default(autoincrement())
+  nome          String
+  criado_em     DateTime    @default(now())
+  usuarios      Usuario[]
+}
+
+model Usuario {
+  id            Int         @id @default(autoincrement())
+  nome          String
+  email         String      @unique
+  senha_hash    String
+  usuarios      DateTime    @default(now())
+
+  empresaId     Int
+  empresa     Empresa     @relation(fields: [empresaId], references: [id])
+
+  @@index([empresaId])
+}
