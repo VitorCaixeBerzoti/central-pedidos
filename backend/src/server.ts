@@ -86,6 +86,51 @@ app.post("/pedidos", async(req, res) => {
         }
 });
 
+app.get("/pedidos", async (_req, res) => {
+    try {
+        const pedidos = await prisma.pedido.findMany({
+            include: { itens: true },
+            orderBy: { id: "desc" }
+        });
+        res.status(200).json({ pedidos });
+    } catch (erro) {
+        console.error(erro);
+        res.status(500).json({ mensagem: "Nao foi possivel consultar os pedidos." });
+    }
+});
+
+app.get("/pedidos/:pedido_id", async (req, res) => {
+    const { pedido_id } = req.params
+
+    try {
+        const pedido = await prisma.pedido.findUnique({
+            where: {
+                pedido_id: pedido_id
+            },
+            include: {
+                itens: true
+            }
+        })
+
+        if (!pedido) {
+            res.status(404).json({
+                mensagem: "Pedido não encontrado."
+            })
+            return
+        }
+
+        res.status(200).json({
+            pedido: pedido
+        })
+    } catch (erro) {
+        console.error(erro)
+
+        res.status(500).json({
+            mensagem: "Não foi possivel consultar o pedido."
+        })
+    }
+})
+
 app.listen(3000, () => {
     console.log("API disponivel em http://localhost:3000");
 });
