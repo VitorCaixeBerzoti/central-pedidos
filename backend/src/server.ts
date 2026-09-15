@@ -184,6 +184,11 @@ app.patch("/pedidos/:pedido_id/status", async (req, res) => {
             return
         }
 
+        if (!transicoesPermitidas[pedidoAtual.status].includes(novoStatus)) {
+            res.status(409).json({ mensagem: "Transicao de status nao permitida." });
+            return;
+        }
+
         const pedido = await prisma.pedido.update({
             where: {
                 pedido_id,
