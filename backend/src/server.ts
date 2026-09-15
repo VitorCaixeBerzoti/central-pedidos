@@ -1,4 +1,5 @@
 import express from "express";
+import { Prisma } from "./generated/prisma/client.js";
 import { z } from "zod";
 import { prisma } from "./lib/prisma.js";
 
@@ -73,6 +74,10 @@ app.post("/pedidos", async(req, res) => {
             pedido: pedidoSalvo
         })
         } catch (erro) {
+            if (erro instanceof Prisma.PrismaClientKnownRequestError && erro.code === "P2002") {
+                res.status(409).json({ mensagem: "Ja existe um pedido com esse pedido_id." });
+                return;
+            }
             console.error(erro);
 
             res.status(500).json({
