@@ -52,7 +52,7 @@ app.post("/pedidos", async(req, res) => {
         const pedidoSalvo = await prisma.pedido.create({
             data: {
                 pedido_id: pedido.pedido_id,
-                frete: pedido.desconto,
+                frete: pedido.frete,
                 desconto: pedido.desconto,
                 valor_total: Number(valorTotal.toFixed(2)),
                 itens: {
