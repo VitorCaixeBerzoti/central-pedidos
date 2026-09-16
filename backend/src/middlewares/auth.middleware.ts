@@ -65,7 +65,9 @@ export function autenticar(
         }
     } catch {
         res.status(401).json({
-            mensgame: "Token inválido ou expirado"})
+            mensgame: "Token inválido ou expirado"
+        })
+        return
     }
 
     next()

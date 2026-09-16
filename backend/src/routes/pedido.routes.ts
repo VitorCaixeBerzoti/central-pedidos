@@ -6,7 +6,7 @@ import { pedidoSchema, atualizarStatusSchema, transicoesPermitidas, listarPedido
 export const pedidoRouter = Router()
 
 pedidoRouter.use((_req, res, next) => {
-    const empresaId = res.locals.usuarios?.empresaId
+    const empresaId = res.locals.usuario?.empresaId
 
     if (!Number.isSafeInteger(empresaId) || empresaId <= 0) {
         res.status(401).json({
@@ -39,6 +39,13 @@ pedidoRouter.post("/", async(req, res) => {
     })
 
     const valorTotal = subtotal + pedido.frete - pedido.desconto;
+
+    if (valorTotal < 0) {
+        res.status(400).json({
+            mensagem: "O desconto não pode ultrapassar o subtotal mais o frete."
+        })
+        return
+    }
 
     try {
         const pedidoSalvo = await prisma.pedido.create({
@@ -184,7 +191,7 @@ pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
 
     try {
         const pedidoAtual = await prisma.pedido.findUnique({
-            where: {pedido_id},
+            where: {pedido_id, empresaId},
         })
 
         if (!pedidoAtual) {
