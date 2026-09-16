@@ -5,7 +5,21 @@ import { pedidoSchema, atualizarStatusSchema, transicoesPermitidas, listarPedido
 
 export const pedidoRouter = Router()
 
+pedidoRouter.use((_req, res, next) => {
+    const empresaId = res.locals.usuarios?.empresaId
+
+    if (!Number.isSafeInteger(empresaId) || empresaId <= 0) {
+        res.status(401).json({
+            mensagem: "Autenticação sem empresa válida."
+        })
+        return
+    }
+
+    next()
+})
+
 pedidoRouter.post("/", async(req, res) => {
+    const empresaId: number = res.locals.usuario.empresaId
     const validacao = pedidoSchema.safeParse(req.body);
 
     if(!validacao.success) {
@@ -29,6 +43,7 @@ pedidoRouter.post("/", async(req, res) => {
     try {
         const pedidoSalvo = await prisma.pedido.create({
             data: {
+                empresaId,
                 pedido_id: pedido.pedido_id,
                 frete: pedido.frete,
                 desconto: pedido.desconto,
@@ -64,6 +79,7 @@ pedidoRouter.post("/", async(req, res) => {
 });
 
 pedidoRouter.get("/", async (req, res) => {
+    const empresaId: number = res.locals.usuario.empresaId
     const validacao = listarPedidosSchema.safeParse(req.query)
 
     if (!validacao.success) {
@@ -77,7 +93,10 @@ pedidoRouter.get("/", async (req, res) => {
     }
     
     const { pagina, limite, status } = validacao.data
-    const filtro = status ? { status } : {}
+    const filtro: Prisma.PedidoWhereInput = {
+        empresaId,
+        ...(status ? { status } : {})
+    }
     
     try {
         const pedidos = await prisma.pedido.findMany({
@@ -115,12 +134,14 @@ pedidoRouter.get("/", async (req, res) => {
 })
 
 pedidoRouter.get("/:pedido_id", async (req, res) => {
+    const empresaId: number = res.locals.usuario.empresaId
     const { pedido_id } = req.params
 
     try {
         const pedido = await prisma.pedido.findUnique({
             where: {
-                pedido_id: pedido_id
+                pedido_id,
+                empresaId
             },
             include: {
                 itens: true
@@ -147,6 +168,7 @@ pedidoRouter.get("/:pedido_id", async (req, res) => {
 })
 
 pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
+    const empresaId: number = res.locals.usuario.empresaId
     const { pedido_id } = req.params;
     const validacao = atualizarStatusSchema.safeParse(req.body)
 
@@ -188,6 +210,7 @@ pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
         const pedido = await prisma.pedido.update({
             where: {
                 pedido_id,
+                empresaId,
                 status: pedidoAtual.status
             },
             data: {
