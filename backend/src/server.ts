@@ -1,6 +1,7 @@
 import express from "express";
 import { pedidoRouter } from "./routes/pedido.routes.js"
 import { authRouter } from "./routes/auth.routes.js"
+import { autenticar } from "./middlewares/auth.middleware.js"
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.get("/health", (_req, res) => {
     });
 });
 
-app.use("/pedidos", pedidoRouter)
+app.use("/pedidos", autenticar, pedidoRouter)
 
 app.listen(3000, () => {
     console.log("API disponivel em http://localhost:3000");
