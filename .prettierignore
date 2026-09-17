@@ -1,0 +1,12 @@
+node_modules
+dist
+backend/src/generated
+backend/prisma/migrations
+artifacts
+test-results
+playwright-report
+.agents
+.cortex
+package-lock.json
+backend/package-lock.json
+frontend/package-lock.json
