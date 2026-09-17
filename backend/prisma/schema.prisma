@@ -14,7 +14,7 @@ datasource db {
 
 model Pedido {
   id             Int          @id @default(autoincrement())
-  pedido_id      String       @unique
+  pedido_id      String       
   frete          Decimal      @default(0) @db.Decimal(12, 2)
   desconto       Decimal      @default(0) @db.Decimal(12, 2)
   valor_total    Decimal      @db.Decimal(12, 2)
@@ -24,6 +24,8 @@ model Pedido {
   atualizado_em  DateTime     @default(now()) @updatedAt
   empresa        Empresa     @relation(fields: [empresaId], references: [id])
   empresaId      Int
+
+  @@unique([empresaId, pedido_id])
 }
 
 model ItemPedido {

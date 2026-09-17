@@ -147,8 +147,10 @@ pedidoRouter.get("/:pedido_id", async (req, res) => {
     try {
         const pedido = await prisma.pedido.findUnique({
             where: {
-                pedido_id,
-                empresaId
+                empresaId_pedido_id: {
+                    pedido_id,
+                    empresaId
+                }
             },
             include: {
                 itens: true
@@ -191,7 +193,12 @@ pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
 
     try {
         const pedidoAtual = await prisma.pedido.findUnique({
-            where: {pedido_id, empresaId},
+            where: {
+                empresaId_pedido_id: {
+                    pedido_id, 
+                    empresaId
+                }
+            },
         })
 
         if (!pedidoAtual) {
@@ -216,8 +223,10 @@ pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
 
         const pedido = await prisma.pedido.update({
             where: {
-                pedido_id,
-                empresaId,
+                empresaId_pedido_id: {
+                    empresaId,
+                    pedido_id
+                },
                 status: pedidoAtual.status
             },
             data: {
