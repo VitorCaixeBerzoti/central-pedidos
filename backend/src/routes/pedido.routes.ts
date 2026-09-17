@@ -152,8 +152,27 @@ pedidoRouter.get("/:pedido_id", async (req, res) => {
                     empresaId
                 }
             },
-            include: {
-                itens: true
+            select: {
+                pedido_id: true,
+                status: true,
+                historico: {
+                    orderBy: [
+                        { criado_em: "desc" },
+                        { id: "desc" }
+                    ],
+                    select: {
+                        id: true,
+                        status_anterior: true,
+                        status_novo: true,
+                        criado_em: true,
+                        usuario: {
+                            select: {
+                                id: true,
+                                nome: true
+                            }
+                        }
+                    }
+                }
             }
         })
 
@@ -178,6 +197,7 @@ pedidoRouter.get("/:pedido_id", async (req, res) => {
 
 pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
     const empresaId: number = res.locals.usuario.empresaId
+    const usuarioId: number = res.locals.usuario.id
     const { pedido_id } = req.params;
     const validacao = atualizarStatusSchema.safeParse(req.body)
 
@@ -230,7 +250,19 @@ pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
                 status: pedidoAtual.status
             },
             data: {
-                status: novoStatus
+                status: novoStatus,
+                historico: {
+                    create: {
+                        status_anterior: pedidoAtual.status,
+                        status_novo: novoStatus,
+                        usuario: {
+                            connect: {
+                                id: usuarioId,
+                                empresaId
+                            }
+                        }
+                    }
+                }
             }
         })
 

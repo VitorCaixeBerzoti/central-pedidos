@@ -24,6 +24,7 @@ model Pedido {
   atualizado_em  DateTime     @default(now()) @updatedAt
   empresa        Empresa     @relation(fields: [empresaId], references: [id])
   empresaId      Int
+  historico      HistoricoStatusPedido[]
 
   @@unique([empresaId, pedido_id])
 }
@@ -56,14 +57,32 @@ model Empresa {
 }
 
 model Usuario {
-  id              Int      @id @default(autoincrement())
-  nome            String
-  email           String   @unique
-  senha_hash      String
-  usuarios        DateTime @default(now())
+  id                  Int      @id @default(autoincrement())
+  nome                String
+  email               String   @unique
+  senha_hash          String
+  usuarios            DateTime @default(now())
 
-  empresa         Empresa @relation(fields: [empresaId], references: [id])
-  empresaId       Int
+  empresa             Empresa @relation(fields: [empresaId], references: [id])
+  empresaId           Int
+
+  alteracoesStatus    HistoricoStatusPedido[] 
 
   @@index([empresaId])
+}
+
+model HistoricoStatusPedido {
+  id                  Int               @id @default(autoincrement())
+  status_anterior     StatusPedido      
+  status_novo         StatusPedido
+  criado_em           DateTime          @default(now())
+
+  pedidoId            Int
+  pedido              Pedido            @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
+
+  usuarioId           Int
+  usuario           Usuario           @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+
+  @@index([pedidoId, criado_em])
+  @@index([usuarioId])
 }
