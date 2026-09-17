@@ -102,6 +102,7 @@ pedidoRouter.get("/", async (req, res) => {
     const { pagina, limite, status } = validacao.data
     const filtro: Prisma.PedidoWhereInput = {
         empresaId,
+        compraId: null,
         ...(status ? { status } : {})
     }
     
@@ -140,7 +141,28 @@ pedidoRouter.get("/", async (req, res) => {
     }
 })
 
+pedidoRouter.get("/resumo", async (_req, res) => {
+    const grupos = await prisma.pedido.groupBy({
+        by: ["status"], where: { empresaId: res.locals.usuario.empresaId, compraId: null },
+        _count: true, _sum: { valor_total: true }
+    })
+    res.json({ total: grupos.reduce((s, g) => s + g._count, 0),
+        por_status: Object.fromEntries(grupos.map(g => [g.status, g._count])),
+        valor_total_nao_cancelado: grupos.filter(g => g.status !== "CANCELADO")
+            .reduce((s, g) => s.add(g._sum.valor_total ?? 0), new Prisma.Decimal(0)).toFixed(2)
+    })
+})
+
 pedidoRouter.get("/:pedido_id", async (req, res) => {
+    const pedido = await prisma.pedido.findUnique({
+        where: { empresaId_pedido_id: { empresaId: res.locals.usuario.empresaId, pedido_id: req.params.pedido_id }, compraId: null },
+        include: { itens: true }
+    })
+    if (!pedido) { res.status(404).json({ mensagem: "Pedido não encontrado." }); return }
+    res.json({ pedido })
+})
+
+pedidoRouter.get("/:pedido_id/historico", async (req, res) => {
     const empresaId: number = res.locals.usuario.empresaId
     const { pedido_id } = req.params
 
@@ -221,7 +243,7 @@ pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
             },
         })
 
-        if (!pedidoAtual) {
+        if (!pedidoAtual || pedidoAtual.compraId) {
             res.status(404).json({
                 mensagem: "Pedido não encontrado."
             })
@@ -236,7 +258,7 @@ pedidoRouter.patch("/:pedido_id/status", async (req, res) => {
             return
         }
 
-        if (!transicoesPermitidas[pedidoAtual.status].includes(novoStatus)) {
+        if (pedidoAtual.compraId || !(transicoesPermitidas[pedidoAtual.status as keyof typeof transicoesPermitidas] ?? []).includes(novoStatus)) {
             res.status(409).json({ mensagem: "Transicao de status nao permitida." });
             return;
         }

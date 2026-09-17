@@ -1,23 +1,13 @@
-import express from "express";
-import { pedidoRouter } from "./routes/pedido.routes.js"
-import { authRouter } from "./routes/auth.routes.js"
-import { autenticar } from "./middlewares/auth.middleware.js"
+import "dotenv/config"
+import { app } from "./app.js"
+import { prisma } from "./lib/prisma.js"
 
-const app = express();
-
-app.use(express.json());
-
-app.use("/auth", authRouter)
-
-app.get("/health", (_req, res) => {
-    res.status(200).json({
-        status: "ok",
-        mensagem: "Central de Pedidos funcionando!"
-    });
-});
-
-app.use("/pedidos", autenticar, pedidoRouter)
-
-app.listen(3000, () => {
-    console.log("API disponivel em http://localhost:3000");
-});
+const port = Number(process.env.PORT ?? 3000)
+const server = app.listen(port, () => console.log(`Órbita disponível em http://localhost:${port}`))
+for (const signal of ["SIGTERM", "SIGINT"] as const) {
+  process.once(signal, () => {
+    server.close(() => {
+      void prisma.$disconnect().then(() => process.exit(0))
+    })
+  })
+}

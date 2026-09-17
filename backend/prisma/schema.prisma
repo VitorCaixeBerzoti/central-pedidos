@@ -25,6 +25,11 @@ model Pedido {
   empresa        Empresa     @relation(fields: [empresaId], references: [id])
   empresaId      Int
   historico      HistoricoStatusPedido[]
+  compraId       String?
+  compra         Compra? @relation(fields: [compraId], references: [id], onDelete: Restrict)
+  estorno        Estorno?
+
+  @@index([compraId])
 
   @@unique([empresaId, pedido_id])
 }
@@ -34,6 +39,10 @@ model ItemPedido {
   sku            String
   quantidade     Int
   valor_unitario Decimal @db.Decimal(12, 2)
+  nome           String?
+  imagem         String?
+  produtoId      String?
+  produto        Produto? @relation(fields: [produtoId], references: [id], onDelete: Restrict)
 
   pedidoId       Int
   pedido         Pedido @relation(fields: [pedidoId], references: [id])
@@ -46,6 +55,10 @@ enum StatusPedido {
   EM_PROCESSAMENTO
   CONCLUIDO
   CANCELADO
+  PAGO
+  PREPARANDO
+  ENVIADO
+  ENTREGUE
 }
 
 model Empresa {
@@ -54,6 +67,9 @@ model Empresa {
   criado_em       DateTime  @default(now())
   usuarios        Usuario[]
   pedidos         Pedido[]
+  descricao       String @default("")
+  produtos        Produto[]
+  contas          Conta[]
 }
 
 model Usuario {
@@ -80,9 +96,111 @@ model HistoricoStatusPedido {
   pedidoId            Int
   pedido              Pedido            @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
 
-  usuarioId           Int
-  usuario           Usuario           @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+  usuarioId           Int?
+  usuario           Usuario?           @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+  contaId             String?
+  conta               Conta? @relation(fields: [contaId], references: [id], onDelete: Restrict)
 
   @@index([pedidoId, criado_em])
   @@index([usuarioId])
+}
+
+enum PapelConta {
+  COMPRADOR
+  VENDEDOR
+}
+
+model Conta {
+  id String @id @default(uuid())
+  nome String
+  email String @unique
+  senhaHash String
+  papel PapelConta
+  empresaId Int?
+  empresa Empresa? @relation(fields: [empresaId], references: [id], onDelete: Restrict)
+  criadoEm DateTime @default(now())
+  perfis PerfilConectado[]
+  carrinho CarrinhoItem[]
+  compras Compra[]
+  historico HistoricoStatusPedido[]
+  @@index([empresaId])
+}
+
+model SessaoNavegador {
+  id String @id @default(uuid())
+  tokenHash String @unique
+  contaAtivaId String?
+  expiraEm DateTime
+  criadoEm DateTime @default(now())
+  perfis PerfilConectado[]
+  @@index([expiraEm])
+}
+
+model PerfilConectado {
+  sessaoId String
+  contaId String
+  sessao SessaoNavegador @relation(fields: [sessaoId], references: [id], onDelete: Cascade)
+  conta Conta @relation(fields: [contaId], references: [id], onDelete: Cascade)
+  @@id([sessaoId, contaId])
+  @@index([contaId])
+}
+
+model Categoria {
+  id String @id
+  nome String
+  produtos Produto[]
+}
+
+model Produto {
+  id String @id @default(uuid())
+  nome String
+  descricao String
+  precoCentavos Int
+  estoque Int
+  imagem String
+  ativo Boolean @default(true)
+  destaque Boolean @default(false)
+  categoriaId String
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+  empresaId Int
+  empresa Empresa @relation(fields: [empresaId], references: [id], onDelete: Restrict)
+  criadoEm DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  carrinhos CarrinhoItem[]
+  itensVendidos ItemPedido[]
+  @@index([empresaId, ativo])
+  @@index([categoriaId, ativo])
+  @@index([ativo, criadoEm])
+}
+
+model CarrinhoItem {
+  contaId String
+  produtoId String
+  quantidade Int
+  conta Conta @relation(fields: [contaId], references: [id], onDelete: Cascade)
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  @@id([contaId, produtoId])
+  @@index([produtoId])
+}
+
+model Compra {
+  id String @id @default(uuid())
+  contaId String
+  conta Conta @relation(fields: [contaId], references: [id], onDelete: Restrict)
+  chaveIdempotencia String
+  totalCentavos Int
+  endereco Json
+  pagamento String @default("APROVADO")
+  criadoEm DateTime @default(now())
+  pedidos Pedido[]
+  @@unique([contaId, chaveIdempotencia])
+  @@index([contaId, criadoEm])
+}
+
+model Estorno {
+  id String @id @default(uuid())
+  pedidoId Int @unique
+  pedido Pedido @relation(fields: [pedidoId], references: [id], onDelete: Restrict)
+  valorCentavos Int
+  criadoEm DateTime @default(now())
 }
