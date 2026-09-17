@@ -1,0 +1,21 @@
+{
+  "name": "orbita-marketplace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write frontend/src backend/src/marketplace backend/src/app.ts backend/src/server.ts backend/tests backend/prisma/seed.ts scripts tests playwright.config.ts",
+    "format:check": "prettier --check frontend/src backend/src/marketplace backend/src/app.ts backend/src/server.ts backend/tests backend/prisma/seed.ts scripts tests playwright.config.ts",
+    "dev": "concurrently -k -n api,web -c cyan,green \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "build": "npm --prefix backend run typecheck && npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
+    "test": "npm --prefix backend test && playwright test",
+    "test:e2e": "playwright test",
+    "setup": "npm --prefix backend ci && npm --prefix frontend ci && npm --prefix backend run db:generate && npm --prefix backend run db:migrate && npm --prefix backend run db:seed"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
+    "@playwright/test": "^1.58.2",
+    "concurrently": "^9.2.1",
+    "prettier": "^3.9.7"
+  }
+}
