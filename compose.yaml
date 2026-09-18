@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: central_pedidos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: orbita_demo_local
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d central_pedidos"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:orbita_demo_local@db:5432/central_pedidos
+      JWT_SECRET: orbita-demo-local-segredo-para-docker-compose-2026
+      PORT: "3000"
+      APP_ORIGIN: http://localhost:3000,http://127.0.0.1:3000
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - uploads:/app/backend/storage/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  postgres_data:
+  uploads:
