@@ -39,4 +39,14 @@ git switch feat/marketplace-orbita
 npm run dev
 ```
 
-As branches anteriores, incluindo `main` e `feat/resumo-pedidos`, mantêm suas pontas originais. Não houve publicação de branches no remoto nesta organização. As pastas locais de skills e seu arquivo de controle, que já estavam sem rastreamento antes da implementação, ficaram fora dos commits da Órbita.
+## Organização posterior
+
+Depois da entrega inicial, foram criadas branches locais encadeadas para manter cada alteração em um commit próprio:
+
+| Branch | Conteúdo |
+| --- | --- |
+| `feat/docker-compose` | Imagem da aplicação e Compose com PostgreSQL. |
+| `chore/limpeza-projeto` | Remoção de guias de agentes duplicados e do script de download que já não era necessário. |
+| `docs/resumo-projeto` | README mais curto, resumo das tecnologias e atualização deste mapa. |
+
+`feat/marketplace-orbita` aponta para o conjunto completo, incluindo esses três commits. As branches anteriores conservam seus pontos originais. Os arquivos locais de skills que já estavam sem rastreamento não entraram nos commits. As novas branches são locais até que sejam publicadas explicitamente.
