@@ -19,4 +19,4 @@ Fotos de demonstração obtidas do Unsplash e armazenadas em `frontend/public/im
 | speaker.jpg    | https://images.unsplash.com/photo-1608043152269-423dbba4e7e1 |
 | plant.jpg      | https://images.unsplash.com/photo-1485955900006-10f4d324d411 |
 
-O script `scripts/download-assets.mjs` registra as URLs e permite recuperar os arquivos. Para uma publicação comercial, substitua o catálogo fictício por fotos e informações dos produtos reais das lojas.
+As URLs acima registram a origem das imagens. Para uma publicação comercial, substitua o catálogo fictício por fotos e informações dos produtos reais das lojas.
