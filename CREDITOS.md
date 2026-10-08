@@ -1,6 +1,6 @@
 # Recursos visuais
 
-Identidade Órbita, composições, cores e marca vetorial desenvolvidas no projeto. Ícones: Lucide. Fontes DM Sans e Space Grotesk servidas localmente via Fontsource; os pacotes incluem seus arquivos de licença.
+Identidade Órbita, composições, cores e marca vetorial desenvolvidas no projeto. Ícones: Lucide. Fonte DM Sans servida localmente via Fontsource; o pacote inclui seus arquivos de licença.
 
 Fotos de demonstração obtidas do Unsplash e armazenadas em `frontend/public/images`. Os arquivos são usados como ilustrações de um marketplace de estudo. Os nomes e descrições dos anúncios não equivalem a fichas técnicas de produtos reais.
 
