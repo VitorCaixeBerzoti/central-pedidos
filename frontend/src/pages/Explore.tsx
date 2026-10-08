@@ -48,13 +48,12 @@ export default function Explore() {
       </div>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">SIGA SUA CURIOSIDADE</span>
           <h1>
             {params.get("busca")
               ? `Resultados para “${params.get("busca")}”`
-              : (category?.nome ?? "Um universo de achados.")}
+              : (category?.nome ?? "Todos os produtos")}
           </h1>
-          <p>Escolha o que faz sentido para o seu mundo.</p>
+          <p>Encontre produtos por categoria e faixa de preço.</p>
         </div>
         <button
           className="button secondary filter-mobile-button"
@@ -133,18 +132,11 @@ export default function Explore() {
               <X size={15} /> Limpar filtros
             </button>
           )}
-          <div className="filter-note">
-            <span className="mini-orbit" />
-            <strong>Boas escolhas têm seu tempo.</strong>
-            <p>Explore lojas diferentes e descubra algo seu.</p>
-          </div>
         </aside>
         <section className="catalog-results" aria-label="Resultados">
           <div className="results-bar">
             <span aria-live="polite">
-              {result.data
-                ? `${result.data.total} produtos encontrados`
-                : "Buscando seus próximos achados…"}
+              {result.data ? `${result.data.total} produtos encontrados` : "Carregando produtos…"}
             </span>
             <label>
               Ordenar por
@@ -152,7 +144,7 @@ export default function Explore() {
                 value={params.get("ordem") ?? "destaques"}
                 onChange={(e) => change("ordem", e.target.value)}
               >
-                <option value="destaques">Nossa seleção</option>
+                <option value="destaques">Destaques</option>
                 <option value="recentes">Mais recentes</option>
                 <option value="menor-preco">Menor preço</option>
                 <option value="maior-preco">Maior preço</option>
@@ -165,7 +157,7 @@ export default function Explore() {
             <ErrorState retry={() => result.refetch()} />
           ) : !result.data.produtos.length ? (
             <Empty
-              title="Ainda não encontramos esse achado."
+              title="Nenhum produto encontrado"
               description="Tente outra busca ou ajuste os filtros."
               action={
                 <Button className="secondary" onClick={() => setParams({})}>
@@ -176,8 +168,8 @@ export default function Explore() {
           ) : (
             <>
               <div className="product-grid catalog-grid">
-                {result.data.produtos.map((product, index) => (
-                  <ProductCard key={product.id} product={product} index={index} />
+                {result.data.produtos.map((product) => (
+                  <ProductCard key={product.id} product={product} />
                 ))}
               </div>
               {result.data.paginas > 1 && (

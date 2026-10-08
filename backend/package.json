@@ -9,8 +9,7 @@
     "start": "tsx src/server.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
-    "db:seed": "tsx prisma/seed.ts",
-    "test": "tsx --test tests/*.test.ts"
+    "db:seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -39,9 +38,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.5.1",
     "@types/pg": "^8.23.1",
-    "@types/supertest": "^7.2.1",
     "prisma": "7.10.0",
-    "supertest": "^7.2.2",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
   }

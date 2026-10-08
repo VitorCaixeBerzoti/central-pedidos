@@ -33,8 +33,7 @@ function AccountContent() {
     <div className="container page">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">DO SEU JEITO</span>
-          <h1>Minha conta.</h1>
+          <h1>Minha conta</h1>
           <p>Seus dados e a segurança do seu perfil.</p>
         </div>
       </div>

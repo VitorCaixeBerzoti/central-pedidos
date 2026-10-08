@@ -7,17 +7,9 @@ export default function Sell() {
   return (
     <div className="container page">
       <section className="sell-hero">
-        <span className="eyebrow">PARA QUEM TEM ALGO A COMPARTILHAR</span>
-        <h1>
-          Sua loja.
-          <br />
-          Novas <span>possibilidades.</span>
-        </h1>
-        <p>
-          Transforme seus produtos nos próximos achados de alguém.
-          <br />
-          Abra sua vitrine e faça parte da Órbita.
-        </p>
+        <span className="eyebrow">ÁREA DO VENDEDOR</span>
+        <h1>Venda seus produtos na Órbita</h1>
+        <p>Cadastre sua loja, organize o catálogo e gerencie seus pedidos em um só lugar.</p>
         {session.conta?.papel === "VENDEDOR" ? (
           <Link to="/painel" className="button">
             Ir para minha loja
@@ -34,12 +26,12 @@ export default function Sell() {
         {[
           {
             Icon: Store,
-            title: "Encontre seu espaço",
+            title: "Cadastre sua loja",
             text: "Crie uma conta vendedora e dê um nome à sua loja. A publicação é livre nesta demonstração.",
           },
           {
             Icon: Boxes,
-            title: "Prepare sua vitrine",
+            title: "Publique seus produtos",
             text: "Adicione fotos, descrições, preço e estoque. Organize seus produtos em várias categorias.",
           },
           {

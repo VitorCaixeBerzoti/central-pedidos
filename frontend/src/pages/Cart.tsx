@@ -58,11 +58,11 @@ function CartContent() {
   if (!data?.quantidade)
     return (
       <Empty
-        title="Seu próximo achado está esperando."
-        description="Seu carrinho está vazio. Explore o catálogo e encontre algo que combine com você."
+        title="Seu carrinho está vazio"
+        description="Veja os produtos disponíveis e adicione os itens que deseja comprar."
         action={
           <Link className="button" to="/explorar">
-            Começar a explorar
+            Ver produtos
             <ArrowRight size={18} />
           </Link>
         }
@@ -84,11 +84,10 @@ function CartContent() {
       </div>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">QUASE NA SUA ÓRBITA</span>
-          <h1>{checkout ? "Para onde vão seus achados?" : "Seu carrinho."}</h1>
+          <h1>{checkout ? "Entrega e pagamento" : "Meu carrinho"}</h1>
           <p>
             {data.quantidade} itens, {data.grupos.length}{" "}
-            {data.grupos.length === 1 ? "loja" : "lojas"}. Uma nova descoberta a caminho.
+            {data.grupos.length === 1 ? "loja" : "lojas"}. Confira os itens antes de finalizar.
           </p>
         </div>
         <div className="checkout-steps">
@@ -263,7 +262,10 @@ function CartContent() {
                           disabled={update.isPending || item.quantidade <= 1 || pay.isPending}
                           aria-label={`Diminuir ${item.produto.nome}`}
                           onClick={() =>
-                            update.mutate({ id: item.produtoId, quantidade: item.quantidade - 1 })
+                            update.mutate({
+                              id: item.produtoId,
+                              quantidade: item.quantidade - 1,
+                            })
                           }
                         >
                           <Minus size={14} />
@@ -277,7 +279,10 @@ function CartContent() {
                           }
                           aria-label={`Aumentar ${item.produto.nome}`}
                           onClick={() =>
-                            update.mutate({ id: item.produtoId, quantidade: item.quantidade + 1 })
+                            update.mutate({
+                              id: item.produtoId,
+                              quantidade: item.quantidade + 1,
+                            })
                           }
                         >
                           <Plus size={14} />

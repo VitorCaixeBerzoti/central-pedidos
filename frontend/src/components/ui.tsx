@@ -1,12 +1,12 @@
 import { useEffect, useId, useRef, type ReactNode, type ButtonHTMLAttributes } from "react"
 import { Link } from "react-router-dom"
-import { ArrowUpRight, CircleAlert, LoaderCircle, PackageOpen, X } from "lucide-react"
+import { CircleAlert, LoaderCircle, PackageOpen, X } from "lucide-react"
 import type { Produto, Status } from "../types"
 import { money } from "../lib/api"
 
-export function Logo({ light = false }: { light?: boolean }) {
+export function Logo() {
   return (
-    <Link to="/" className={`logo ${light ? "logo-light" : ""}`} aria-label="Órbita — início">
+    <Link to="/" className="logo" aria-label="Órbita — início">
       <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
         <circle cx="20" cy="20" r="10" stroke="currentColor" strokeWidth="3" />
         <ellipse
@@ -157,31 +157,23 @@ export function StatusBadge({ status }: { status: Status }) {
     </span>
   )
 }
-export function ProductCard({ product, index = 0 }: { product: Produto; index?: number }) {
+export function ProductCard({ product }: { product: Produto }) {
   return (
-    <Link
-      className="product-card"
-      to={`/produto/${product.id}`}
-      style={{ animationDelay: `${Math.min(index, 7) * 45}ms` }}
-    >
+    <Link className="product-card" to={`/produto/${product.id}`}>
       <div className="product-photo">
         <img src={product.imagem} alt={product.nome} loading="lazy" width="600" height="600" />
         {product.estoque === 0 ? (
           <span className="product-tag neutral">Esgotado</span>
         ) : product.destaque ? (
-          <span className="product-tag">Nossa seleção</span>
+          <span className="product-tag">Destaque</span>
         ) : null}
-        <span className="product-arrow">
-          <ArrowUpRight size={20} />
-        </span>
       </div>
-      <div className="product-meta">
-        <span>{product.categoria.nome}</span>
-        <span>{product.empresa.nome}</span>
+      <div className="product-card-body">
+        <div className="product-meta">{product.empresa.nome}</div>
+        <h3>{product.nome}</h3>
+        <div className="product-price">{money(product.precoCentavos)}</div>
+        <p className="product-caption">Frete de R$ 15,00 por loja</p>
       </div>
-      <h3>{product.nome}</h3>
-      <div className="product-price">{money(product.precoCentavos)}</div>
-      <p className="product-caption">Frete de R$ 15,00 por loja</p>
     </Link>
   )
 }

@@ -41,12 +41,11 @@ function OrdersContent() {
       </div>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">CADA DESCOBERTA, UM NOVO CAMINHO</span>
-          <h1>Minhas compras.</h1>
+          <h1>Minhas compras</h1>
           <p>Acompanhe os pedidos de cada loja em um só lugar.</p>
         </div>
         <Link className="button secondary" to="/explorar">
-          Continuar explorando
+          Continuar comprando
           <ArrowRight size={17} />
         </Link>
       </div>
@@ -54,7 +53,7 @@ function OrdersContent() {
         <div className="success-banner">
           <CheckCircle2 size={28} />
           <div>
-            <h2>Seus achados já estão na sua órbita!</h2>
+            <h2>Compra realizada!</h2>
             <p>Pagamento simulado aprovado. Cada loja recebeu seu pedido.</p>
           </div>
         </div>
@@ -65,7 +64,7 @@ function OrdersContent() {
         <ErrorState retry={() => orders.refetch()} />
       ) : !orders.data.length ? (
         <Empty
-          title="Sua primeira descoberta começa aqui."
+          title="Você ainda não tem compras"
           description="Quando você finalizar uma compra, os pedidos aparecerão neste espaço."
           action={
             <Link className="button" to="/explorar">

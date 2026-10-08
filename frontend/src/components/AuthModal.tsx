@@ -14,7 +14,7 @@ export function AuthModal() {
     <Modal
       open={authOpen}
       onClose={() => setAuthOpen(false)}
-      title={session.conta ? "Conecte outro perfil" : "Seu universo começa aqui"}
+      title={session.conta ? "Conectar outro perfil" : "Acesse sua conta"}
     >
       <AuthForm close={() => setAuthOpen(false)} sync={sync} />
     </Modal>
@@ -52,7 +52,7 @@ function AuthForm({
   }
   return (
     <>
-      <p className="muted">Entre para descobrir, comprar e acompanhar seus achados.</p>
+      <p className="muted">Entre para comprar, vender e acompanhar seus pedidos.</p>
       <div className="segmented">
         <button
           className={!cadastro ? "selected" : ""}

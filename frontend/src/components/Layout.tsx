@@ -37,7 +37,7 @@ export default function Layout() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" })
     setMenuOpen(false)
-  }, [location.pathname])
+  }, [location.pathname, location.search])
   function search(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const q = new FormData(e.currentTarget).get("busca")?.toString().trim()
@@ -62,14 +62,6 @@ export default function Layout() {
       <a href="#conteudo" className="skip-link">
         Pular para o conteúdo
       </a>
-      <div className="announcement">
-        <div className="container">
-          <span>Novas lojas. Novas ideias. Seu próximo achado.</span>
-          <span className="demo-indicator">
-            <span /> Experiência demonstrativa
-          </span>
-        </div>
-      </div>
       <header className="site-header">
         <div className="container header-main">
           <Logo />
@@ -78,7 +70,7 @@ export default function Layout() {
             <input
               name="busca"
               type="search"
-              placeholder="O que está na sua órbita?"
+              placeholder="Buscar produtos..."
               aria-label="Buscar produtos"
             />
             <button type="submit" aria-label="Pesquisar">
@@ -101,7 +93,7 @@ export default function Layout() {
                 )}
               </span>
               <span className="profile-label">
-                <small>{session.conta ? "Bom ter você aqui," : "Seu espaço"}</small>
+                <small>{session.conta ? "Olá," : "Minha conta"}</small>
                 <strong>{session.conta?.nome.split(" ")[0] ?? "Entre ou cadastre-se"}</strong>
               </span>
               <ChevronDown size={14} />
@@ -130,11 +122,13 @@ export default function Layout() {
           className={`container header-nav ${menuOpen ? "menu-open" : ""}`}
         >
           <div>
-            <NavLink to="/explorar">Explorar tudo</NavLink>
+            <NavLink to="/explorar" end>
+              Todos os produtos
+            </NavLink>
             {categories.slice(0, 5).map((c) => (
-              <NavLink key={c.id} to={`/explorar?categoria=${c.id}`}>
+              <Link key={c.id} to={`/explorar?categoria=${c.id}`}>
                 {c.nome}
-              </NavLink>
+              </Link>
             ))}
           </div>
           <Link to={session.conta?.papel === "VENDEDOR" ? "/painel" : "/vender"}>
@@ -146,7 +140,7 @@ export default function Layout() {
       </header>
       {error && (
         <div className="connection-warning" role="alert">
-          Não foi possível conectar ao servidor. Confira se a API está funcionando.
+          Não foi possível carregar os dados. Tente atualizar a página em instantes.
         </div>
       )}
       <main id="conteudo" tabIndex={-1}>
@@ -155,15 +149,11 @@ export default function Layout() {
       <footer className="site-footer">
         <div className="container footer-top">
           <div>
-            <Logo light />
-            <p>
-              Boas descobertas.
-              <br />
-              Novas possibilidades.
-            </p>
+            <Logo />
+            <p>Produtos de diferentes lojas em um só lugar.</p>
           </div>
           <div>
-            <h3>Explore seu universo</h3>
+            <h3>Categorias</h3>
             {categories.slice(0, 4).map((c) => (
               <Link key={c.id} to={`/explorar?categoria=${c.id}`}>
                 {c.nome}
@@ -171,7 +161,7 @@ export default function Layout() {
             ))}
           </div>
           <div>
-            <h3>Seu espaço</h3>
+            <h3>Sua conta</h3>
             <Link to="/compras">Minhas compras</Link>
             <button onClick={() => (session.conta ? setProfilesOpen(true) : setAuthOpen(true))}>
               Meus perfis
@@ -179,20 +169,9 @@ export default function Layout() {
             <Link to="/vender">Comece a vender</Link>
             <Link to="/conta">Minha conta</Link>
           </div>
-          <div className="footer-note">
-            <span className="eyebrow">FEITO PARA EXPLORAR</span>
-            <p>
-              Um marketplace.
-              <br />
-              Muitos caminhos.
-            </p>
-            <span className="footer-orbit" aria-hidden="true">
-              ↗
-            </span>
-          </div>
         </div>
         <div className="container footer-bottom">
-          <span>© {new Date().getFullYear()} Órbita. Um projeto em movimento.</span>
+          <span>© {new Date().getFullYear()} Órbita</span>
           <span>Ambiente de demonstração · pagamentos e entregas simulados</span>
         </div>
       </footer>
