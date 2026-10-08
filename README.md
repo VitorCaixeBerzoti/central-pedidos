@@ -1,29 +1,48 @@
 # Órbita — marketplace
 
-Marketplace de demonstração em português, com catálogo, contas de comprador e vendedor, carrinho, pedidos e painel de vendas. Pagamento e entrega são simulados.
+Marketplace com catálogo, contas de comprador e vendedor, carrinho, pedidos e painel de vendas. Pagamento e entrega são simulados.
 
-O [resumo do projeto](docs/RESUMO-DO-PROJETO.md) reúne funcionalidades, tecnologias, regras e o mapa das pastas.
+## Iniciar
 
-## Abrir com Docker Compose
-
-Na raiz do projeto, com Docker disponível:
+Com o ambiente já preparado e o PostgreSQL ligado, abra o PowerShell na pasta do projeto e execute:
 
 ```powershell
-docker compose up --build -d
+npm.cmd run dev
 ```
 
-Abra <http://localhost:3000>. A API responde em <http://localhost:3000/health>. O Compose cria um banco PostgreSQL próprio, aplica as migrations e prepara os dados de demonstração. A porta 3000 precisa estar livre.
+Abra <http://localhost:5173>. O comando inicia a interface com atualização automática e a API na porta 3000. Mantenha o terminal aberto; `Ctrl+C` encerra os dois processos. As portas 3000 e 5173 precisam estar livres.
+
+No Prompt de Comando (CMD), também pode usar `npm run dev`. No PowerShell, `npm.cmd run dev` evita o bloqueio de scripts do Windows, sem mudar configurações de segurança.
+
+Para executar a versão compilada em <http://localhost:3000>, pare o modo de desenvolvimento e execute:
 
 ```powershell
-docker compose logs -f app
-docker compose down
+npm.cmd run build
+npm.cmd start
 ```
 
-O banco e as fotos enviadas permanecem em volumes Docker após `down`. `docker compose down -v` apaga os dados dessa demonstração.
+## Primeira instalação
+
+Instale Node.js 24 e PostgreSQL 15 ou superior e crie um banco PostgreSQL local. Na pasta do projeto, copie o exemplo de configuração somente se `backend/.env` ainda não existir:
+
+```powershell
+if (!(Test-Path backend/.env)) { Copy-Item backend/.env.example backend/.env }
+```
+
+Configure `DATABASE_URL` em `backend/.env` com o usuário, senha e nome do banco local e substitua `JWT_SECRET` por um segredo aleatório de pelo menos 32 caracteres. Depois execute:
+
+```powershell
+npm.cmd run setup
+npm.cmd run dev
+```
+
+O `setup` instala as dependências da raiz, do backend e do frontend, gera o Prisma Client, aplica as migrations, prepara os dados de demonstração e compila o sistema. Os dados de demonstração não sobrescrevem senhas, estoque ou anúncios já existentes.
+
+Se estiver reaproveitando um banco histórico com `Pedido.empresaId` nulo, vincule esses pedidos à empresa correta antes de executar o `setup`. Bancos novos não precisam desse ajuste.
 
 ## Contas de demonstração
 
-Senha inicial para todas: **`OrbitaDemo2026!`**.
+Senha inicial para todas: **`OrbitaDemo2026!`**. Também é possível cadastrar contas pela interface.
 
 | Email | Perfil | Loja |
 | --- | --- | --- |
@@ -32,36 +51,14 @@ Senha inicial para todas: **`OrbitaDemo2026!`**.
 | forma@orbita.demo | Vendedor | Forma & Casa |
 | movimento@orbita.demo | Vendedor | Movimento |
 
-Também é possível cadastrar contas pela interface e alternar entre perfis conectados.
+## Docker Compose
 
-## Desenvolvimento sem Docker
-
-Requisitos: Node.js 24, npm e PostgreSQL 15 ou superior. Crie `backend/.env` a partir de `backend/.env.example` e configure um banco local. Preserve o arquivo `.env` caso ele já exista.
+Com o Docker em execução, use esta opção para preparar e iniciar o sistema com seu próprio banco:
 
 ```powershell
-npm ci
-npm run setup
-npm run dev
+docker compose up --build -d
 ```
 
-O site abre em <http://localhost:5173> e a API em <http://localhost:3000/health>. `Ctrl+C` encerra ambos. `npm run setup` instala dependências, gera o Prisma Client, aplica migrations e cria os dados de demonstração. O seed não altera senhas, estoque ou anúncios já existentes.
+Abra <http://localhost:3000>. Para acompanhar os logs, execute `docker compose logs -f app`; para parar, `docker compose down`. O banco e as fotos enviadas permanecem nos volumes Docker.
 
-Para atualizar um banco histórico que tenha `Pedido.empresaId` nulo, vincule os registros à empresa correta antes da migration que torna esse campo obrigatório. Em um banco novo, as migrations podem ser aplicadas diretamente.
-
-## Verificação e documentação
-
-```powershell
-npm run build
-npm run format:check
-npx playwright install chromium
-npm test
-```
-
-Os testes usam bancos temporários; o usuário PostgreSQL precisa da permissão `CREATEDB`. Após `npm run build`, `npm start` serve a API e o site juntos na porta 3000.
-
-- [Resumo do projeto](docs/RESUMO-DO-PROJETO.md)
-- [Arquitetura](docs/ARQUITETURA.md)
-- [Plano de estudo](docs/PLANO-DE-ESTUDO.md)
-- [Créditos das imagens](docs/CREDITOS.md)
-- [Histórico de validação](docs/VALIDACAO.md)
-- [Branches da entrega](docs/BRANCHES.md)
+[Créditos das imagens, fontes e ícones](CREDITOS.md).

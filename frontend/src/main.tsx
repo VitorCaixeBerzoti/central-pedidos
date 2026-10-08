@@ -28,7 +28,7 @@ class AppBoundary extends React.Component<{ children: React.ReactNode }, { faile
   render() {
     return this.state.failed ? (
       <Empty
-        title="Algo saiu da órbita."
+        title="Não foi possível abrir esta página."
         description="Recarregue a página para tentar novamente."
         action={
           <button className="button" onClick={() => window.location.reload()}>

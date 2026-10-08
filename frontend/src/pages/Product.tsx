@@ -28,8 +28,10 @@ export default function Product() {
       })
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["privado", session.conta?.id, "carrinho"] })
-      toast.success("Seu achado está no carrinho!")
+      void queryClient.invalidateQueries({
+        queryKey: ["privado", session.conta?.id, "carrinho"],
+      })
+      toast.success("Produto adicionado ao carrinho.")
     },
   })
   if (product.isPending) return <Loading />
@@ -47,7 +49,7 @@ export default function Product() {
       <div className="product-detail">
         <div className="detail-photo">
           <img src={p.imagem} alt={p.nome} width="1000" height="1000" />
-          {p.destaque && <span className="product-tag">Seleção Órbita</span>}
+          {p.destaque && <span className="product-tag">Destaque</span>}
         </div>
         <div className="detail-info">
           <span className="eyebrow">{p.categoria.nome}</span>

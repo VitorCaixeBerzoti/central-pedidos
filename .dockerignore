@@ -1,5 +1,4 @@
 .git
-.github
 .agents
 .cortex
 **/node_modules
@@ -7,10 +6,7 @@
 **/.env
 **/.env.*
 !**/.env.example
+**/*.log
+**/*.tsbuildinfo
+backend/src/generated/prisma
 backend/storage/uploads
-artifacts
-playwright-report
-test-results
-docs
-tests
-scripts

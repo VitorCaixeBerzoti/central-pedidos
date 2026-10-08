@@ -17,7 +17,7 @@ export function AccessGate({ role, children }: { role?: Papel; children: ReactNo
   if (!session.conta)
     return (
       <Empty
-        title="Entre no seu universo."
+        title="Entre na sua conta"
         description="Conecte sua conta para continuar. Seus pedidos e seu carrinho ficam guardados para você."
         action={<Button onClick={() => setAuthOpen(true)}>Entrar ou criar conta</Button>}
       />

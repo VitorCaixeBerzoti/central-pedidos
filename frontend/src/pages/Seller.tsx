@@ -54,7 +54,10 @@ function SellerContent() {
   })
   const change = useMutation({
     mutationFn: ({ id, status }: { id: number; status: Status }) =>
-      api(`/vendedor/pedidos/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+      api(`/vendedor/pedidos/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      }),
     onSuccess: () => {
       void queryClient.invalidateQueries()
       toast.success("Pedido atualizado.")
@@ -77,14 +80,9 @@ function SellerContent() {
     <div className="container page seller-page">
       <div className="seller-heading">
         <div>
-          <span className="eyebrow">
-            <span className="live-dot" /> SEU ESPAÇO PARA CRESCER
-          </span>
-          <h1>
-            {session.conta!.empresa!.nome}
-            <span className="lime-dot">.</span>
-          </h1>
-          <p>As próximas descobertas começam com você.</p>
+          <span className="eyebrow">PAINEL DO VENDEDOR</span>
+          <h1>{session.conta!.empresa!.nome}</h1>
+          <p>Acompanhe as vendas, os produtos e os pedidos da sua loja.</p>
         </div>
         <Link className="button secondary" to={`/explorar?loja=${session.conta!.empresaId}`}>
           Ver minha vitrine
@@ -148,7 +146,7 @@ function SellerContent() {
                 <section className="surface dashboard-status">
                   <div className="section-heading compact">
                     <div>
-                      <h2>O ritmo da sua loja</h2>
+                      <h2>Situação dos pedidos</h2>
                       <p>Pedidos por etapa</p>
                     </div>
                     <ChartNoAxesCombined size={22} />
@@ -173,15 +171,8 @@ function SellerContent() {
                 <section className="dashboard-tip">
                   <span className="eyebrow">PRÓXIMO PASSO</span>
                   <TrendingUp size={34} />
-                  <h2>
-                    Mais achados.
-                    <br />
-                    Mais possibilidades.
-                  </h2>
-                  <p>
-                    Uma boa foto e uma descrição clara ajudam seus produtos a encontrar novas
-                    órbitas.
-                  </p>
+                  <h2>Adicione produtos à sua loja</h2>
+                  <p>Use boas fotos e informe o preço, o estoque e os detalhes de cada produto.</p>
                   <Button onClick={() => setEditing("novo")}>
                     Publicar um produto
                     <Plus size={18} />
@@ -340,8 +331,7 @@ function SellerContent() {
       {tab === "loja" && (
         <div className="settings-layout">
           <div>
-            <span className="eyebrow">A SUA IDENTIDADE</span>
-            <h2>Conte a história da sua loja.</h2>
+            <h2>Dados da loja</h2>
             <p className="muted">Estas informações aparecem na sua vitrine.</p>
             <div className="delivery-box">
               <Store size={25} />
@@ -380,7 +370,7 @@ function SellerContent() {
         wide
         open={!!editing}
         onClose={() => setEditing(null)}
-        title={editing === "novo" ? "Um novo achado na sua loja" : "Editar produto"}
+        title={editing === "novo" ? "Novo produto" : "Editar produto"}
       >
         {editing && (
           <ProductForm
@@ -495,7 +485,7 @@ function ProductForm({ product, saved }: { product?: Produto; saved: () => Promi
           minLength={3}
           maxLength={120}
           defaultValue={product?.nome}
-          placeholder="Um nome claro para o seu achado"
+          placeholder="Nome e modelo do produto"
         />
       </label>
       <label>
